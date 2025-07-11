@@ -17,7 +17,6 @@ export const codeAgent = inngest.createFunction(
 	async ({ event, step }) => {
 		let sandboxUrl: string | null = null;
 		try {
-			// Create sandbox with explicit ID assignment
 			const sandboxId = await step.run("create-sandbox", async () => {
 				const sandbox = await Sandbox.create("vibecraft-nextjs-yousiefsameh");
 				return sandbox.sandboxId;
@@ -167,6 +166,7 @@ export const codeAgent = inngest.createFunction(
 				if (isError) {
 					return await prisma.message.create({
 						data: {
+							projectId: event.data.projectId,
 							content: "Agent execution failed to produce valid output",
 							role: "ASSISTANT",
 							type: "ERROR",
@@ -176,6 +176,7 @@ export const codeAgent = inngest.createFunction(
 
 				return await prisma.message.create({
 					data: {
+						projectId: event.data.projectId,
 						content: result.state.data.summary,
 						role: "ASSISTANT",
 						type: "RESULT",
@@ -202,6 +203,7 @@ export const codeAgent = inngest.createFunction(
 			await step.run("save-error", async () => {
 				return await prisma.message.create({
 					data: {
+						projectId: event.data.projectId,
 						content: `Agent failed: ${(error as Error).message}`,
 						role: "ASSISTANT",
 						type: "ERROR",
