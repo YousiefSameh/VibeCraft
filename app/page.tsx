@@ -1,9 +1,7 @@
 "use client";
 
-"use client";
-
 import { useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation"; 
 import { useTRPC } from "@/trpc/client";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";

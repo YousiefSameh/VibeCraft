@@ -26,6 +26,9 @@ export default function RootLayout({
 }>) {
   return (
     <TRPCReactProvider>
+      <head>
+        <link rel="icon" href="/logo.svg" />
+      </head>
       <html lang="en">
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
