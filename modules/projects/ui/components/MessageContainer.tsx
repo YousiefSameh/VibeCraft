@@ -6,30 +6,39 @@ import { useEffect, useRef } from "react";
 import MessageCard from "./MessageCard";
 import { Fragment } from "@/lib/generated/prisma";
 import { MessageForm } from "./MessageForm";
+import MessageLoader from "./MessageLoader";
 
 interface Props {
 	projectId: string;
+  activeFragment: Fragment | null;
+  setActiveFragment: (fragment: Fragment | null) => void;
 }
 
-export const MessageContainer = ({ projectId }: Props) => {
+export const MessageContainer = ({ projectId, activeFragment, setActiveFragment }: Props) => {
 	const trpc = useTRPC();
   const bottomRef = useRef<HTMLDivElement>(null);
 	const { data: messages } = useSuspenseQuery(
 		trpc.messages.getMany.queryOptions({
 			projectId,
-		})
+		}, {
+      // TODO: Temporary
+      refetchInterval: 5000,
+    })
 	);
 
   useEffect(() => {
-    const lastAssistantMessage = messages.findLast((message) => message.role === "ASSISTANT")
-    if (lastAssistantMessage) {
-      // TODO: Set Active Fragment
+    const lastAssistantMessage = messages.findLast((message) => message.role === "ASSISTANT" && !!message.fragment)
+    if (lastAssistantMessage && lastAssistantMessage.fragment) {
+      setActiveFragment(lastAssistantMessage.fragment);
     }
-  }, [messages])
+  }, [messages, setActiveFragment])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView();
-  }, [messages.length])
+  }, [messages.length]);
+
+  const lastMessage = messages[messages.length - 1];
+  const isLastMessageUser = lastMessage?.role === "USER";
 
 	return (
     <div className="flex flex-col flex-1 min-h-0">
@@ -43,10 +52,11 @@ export const MessageContainer = ({ projectId }: Props) => {
               role={message.role}
               type={message.type}
               createdAt={message.createdAt}
-              isActiveFragment={false}
-              onFragemntClick={(fragment: Fragment) => {return fragment}}
+              isActiveFragment={activeFragment?.id === message.fragment?.id}
+              onFragemntClick={() => setActiveFragment(message.fragment)}
             />
           ))}
+          {isLastMessageUser && <MessageLoader />}
           <div ref={bottomRef}/>
         </div>
       </div>
