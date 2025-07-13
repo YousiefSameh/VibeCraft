@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowUpIcon, Loader2Icon } from "lucide-react";
 import TextareaAutosize from "react-textarea-autosize";
 
@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
 import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
+import { Usage } from "./Usage";
+import { useRouter } from "next/navigation";
 
 interface Props {
 	projectId: string;
@@ -28,10 +30,12 @@ const formSchema = z.object({
 type formSchemaType = z.infer<typeof formSchema>;
 
 export const MessageForm = ({ projectId }: Props) => {
+	const router = useRouter();
 	const trpc = useTRPC();
   const queryClient = useQueryClient();
+	const { data: usage } = useQuery(trpc.usage.status.queryOptions());
 	const [isFocused, setIsfocused] = useState(false);
-	const showUsage = false;
+	const showUsage = !!usage;
 	const form = useForm<formSchemaType>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -39,17 +43,23 @@ export const MessageForm = ({ projectId }: Props) => {
 		},
 	});
 
+
 	const createMessage = useMutation(trpc.messages.create.mutationOptions({
     onSuccess: () => {
       form.reset();
       queryClient.invalidateQueries(
         trpc.messages.getMany.queryOptions({ projectId })
       );
-      // TODO: Invalidate Usage Status
+			queryClient.invalidateQueries(
+				trpc.usage.status.queryOptions()
+			);
     },
     onError: (error) => {
-      // TODO: Redirect To Pricing Page, If Specific Error
-      toast.error(error.message)
+      toast.error(error.message);
+
+			if (error.data?.code === "TOO_MANY_REQUESTS") {
+				router.push("/pricing");
+			}
     }
   }));
 
@@ -65,6 +75,9 @@ export const MessageForm = ({ projectId }: Props) => {
 
 	return (
 		<Form {...form}>
+			{ showUsage && (
+				<Usage points={usage.remainingPoints} msBeforeNext={usage.msBeforeNext} />
+			) }
 			<form
 				onSubmit={form.handleSubmit(onSubmit)}
 				className={cn(

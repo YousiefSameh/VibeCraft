@@ -42,15 +42,19 @@ export const ProjectForm = () => {
       queryClient.invalidateQueries(
         trpc.projects.getMany.queryOptions()
       );
+      queryClient.invalidateQueries(
+				trpc.usage.status.queryOptions()
+			);
       router.push(`/projects/${data.id}`);
-      // TODO: Invalidate Usage Status
     },
     onError: (error) => {
+      toast.error(error.message);
       if (error.data?.code === "UNAUTHORIZED") {
         router.push("/sign-in");
       }
-      // TODO: Redirect To Pricing Page, If Specific Error
-      toast.error(error.message)
+			if (error.data?.code === "TOO_MANY_REQUESTS") {
+				router.push("/pricing");
+			}
     }
   }));
 
