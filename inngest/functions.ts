@@ -23,7 +23,7 @@ export const codeAgent = inngest.createFunction(
 			});
 
 			const model = openai({
-				model: "gpt-4o",
+				model: "gpt-4.1",
 				baseUrl: "https://models.github.ai/inference",
 				apiKey: process.env.OPENAI_API_KEY!,
 			});
