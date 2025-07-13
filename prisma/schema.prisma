@@ -15,11 +15,11 @@ datasource db {
 }
 
 model Project {
-  id        String      @id @default(uuid())
-  name String
-  userId String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id        String   @id @default(uuid())
+  name      String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   messages Message[]
 }
@@ -44,7 +44,7 @@ model Message {
 
   fragment  Fragment?
   projectId String
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model Fragment {
@@ -56,4 +56,10 @@ model Fragment {
   files      Json
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model Usage {
+  key    String    @id
+  points Int
+  expire DateTime?
 }
