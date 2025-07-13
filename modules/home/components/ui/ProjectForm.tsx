@@ -46,6 +46,9 @@ export const ProjectForm = () => {
       // TODO: Invalidate Usage Status
     },
     onError: (error) => {
+      if (error.data?.code === "UNAUTHORIZED") {
+        router.push("/sign-in");
+      }
       // TODO: Redirect To Pricing Page, If Specific Error
       toast.error(error.message)
     }
