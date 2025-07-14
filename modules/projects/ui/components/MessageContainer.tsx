@@ -22,7 +22,6 @@ export const MessageContainer = ({ projectId, activeFragment, setActiveFragment 
 		trpc.messages.getMany.queryOptions({
 			projectId,
 		}, {
-      // TODO: Temporary
       refetchInterval: 5000,
     })
 	);
