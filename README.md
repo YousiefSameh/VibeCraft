@@ -17,7 +17,6 @@ VibeCraft is a cutting-edge AI-powered website builder that combines the latest 
 - 🐳 **Docker Templates** - Containerized sandbox environments
 - 🧠 **AI Model Integration** - Support for various AI models
 - 📦 **Prisma + Neon** - Type-safe database operations with serverless PostgreSQL
-- 🤖 **CodeRabbit** - AI-powered code review automation
 - 🧾 **Credit System** - Built-in usage tracking and management
 - 🧪 **Preview Mode** - Toggle between preview and code explorer
 
